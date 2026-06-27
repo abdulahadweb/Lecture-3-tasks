@@ -5,6 +5,7 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    base: '/Lecture-3-tasks/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
