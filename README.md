@@ -1,20 +1,15 @@
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
+written by AbdulAhad
 </div>
 
-# Run and deploy your AI Studio app
 
-This contains everything you need to run your app locally.
+# Class 4 AI based Assignment ~AAM Digital Labs - Agentic workflows Workspace
 
-View your app in AI Studio: https://ai.studio/apps/05495379-1899-4b7e-aaa1-b464a84954ad
+View the live project here: [Agentic app workflow](https://abdulahadweb.github.io/Lecture-3-tasks/)
 
-## Run Locally
+PROJECT ARCHITECTURE SUMMARY:
+- Frontend: Compiled React + Vite + Tailwind CSS v4 single-page architecture optimized for native deployment via GitHub Actions.
+- Routing: Designed as a high-speed unified workspace using state-driven component mounting, eliminating broken sub-path refreshes on static hosts.
+- AI Connection: Features an embedded client-side fetch proxy intercepting outgoing actions and routing them straight to the Gemini Pro/Flash API gateway endpoint, allowing full operational usage directly on GitHub Pages.
 
-**Prerequisites:**  Node.js
 
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
