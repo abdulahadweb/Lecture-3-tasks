@@ -8,6 +8,60 @@ import { MobileResponsiveAgent } from "./components/MobileResponsiveAgent";
 import { cn } from "./lib/utils";
 import type { AgentWorkflow } from "./types";
 
+// ==========================================
+// 🚀 STEP 2: GLOBAL GITHUB PAGES FETCH INTERCEPTOR
+// ==========================================
+if (typeof window !== "undefined" && !window.location.hostname.includes("localhost")) {
+  const originalFetch = window.fetch;
+  window.fetch = async function (input, init) {
+    const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+    
+    // Check if any sub-agent is trying to hit your local Node server
+    if (url.includes("/api/") || url.includes("localhost:3000")) {
+      let apiKey = localStorage.getItem("GEMINI_LIVE_KEY");
+      if (!apiKey) {
+        apiKey = prompt("🔑 Security Gateway: Enter your Gemini API Key to run this agent live on GitHub Pages:") || "";
+        if (apiKey) localStorage.setItem("GEMINI_LIVE_KEY", apiKey);
+      }
+      if (!apiKey) return Promise.reject(new Error("API Key is required"));
+
+      // Pull whatever text data or target URL the agent component sent in the request body
+      let userPrompt = "Perform optimization audit workflow.";
+      if (init && init.body) {
+        try {
+          const bodyData = JSON.parse(init.body.toString());
+          userPrompt = bodyData.prompt || bodyData.url || bodyData.text || JSON.stringify(bodyData);
+        } catch (e) {
+          userPrompt = init.body.toString();
+        }
+      }
+
+      // Point the pipeline straight to Google's public endpoint
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+      const geminiResponse = await originalFetch(geminiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: userPrompt }] }]
+        })
+      });
+
+      if (!geminiResponse.ok) return geminiResponse;
+
+      const geminiData = await geminiResponse.json();
+      const aiText = geminiData.candidates[0].content.parts[0].text;
+
+      // Pack the AI reply text into every common object format your sub-agents might look for
+      const mockBackendJson = { text: aiText, response: aiText, analysis: aiText, report: aiText, audit: aiText };
+      return new Response(JSON.stringify(mockBackendJson), {
+        status: 200,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+    return originalFetch(input, init);
+  };
+}
+
 export default function App() {
   const [activeWorkflow, setActiveWorkflow] = useState<AgentWorkflow>("lead");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
